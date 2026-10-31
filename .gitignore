@@ -1,0 +1,18 @@
+### Python & virtual environment ###
+.venv/
+__pycache__/
+
+### Configuration ###
+.env
+rules.toml
+
+### Generated data ###
+out/
+
+### OS ###
+.DS_Store
+
+### IDEs & editors ###
+.idea/
+.vscode/
+.zed/

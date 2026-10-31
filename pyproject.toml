@@ -1,0 +1,9 @@
+[project]
+name = "refittable"
+description = "Nástroj pro úpravu a export rozvrhů ze Sirius API (FIT ČVUT)"
+readme = "README.md"
+
+version = "0.0.0"
+
+requires-python = ">=3.12"
+dependencies = []
