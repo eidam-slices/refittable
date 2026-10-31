@@ -6,7 +6,13 @@ readme = "README.md"
 version = "0.0.0"
 
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "holidays>=0.107",
+    "httpx>=0.28.1",
+    "icalendar>=7.3.0",
+    "starlette>=1.10.0",
+    "uvicorn>=0.54.0",
+]
 
 [build-system]
 requires = ["hatchling"]
