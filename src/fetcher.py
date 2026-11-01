@@ -3,6 +3,7 @@ import logging
 import time
 
 import httpx
+from icalendar import Calendar
 
 from src.models import Calendars, General, Rules
 
@@ -39,6 +40,15 @@ def build_personal_calendar_url(general: General) -> str:
 
 def build_course_calendar_url(general: General, course_code: str) -> str:
     return build_sirius_url(general, f"courses/{course_code}")
+
+
+def parse_calendar(label: str, ical: str) -> Calendar:
+    try:
+        return Calendar.from_ical(ical)
+    except ValueError as e:
+        raise FetchError(
+            f"Failed to parse iCalendar data for {label}: {e}", label=label
+        ) from e
 
 
 async def fetch_calendar(
@@ -110,14 +120,19 @@ async def fetch_all_calendars(
 
         results = await asyncio.gather(personal_task, *course_tasks)
 
-        elapsed = (time.perf_counter() - t0) * 1000
-        logger.debug(
-            "Successfully fetched %d calendars in %.1f ms",
-            len(results),
-            elapsed,
-        )
+    elapsed = (time.perf_counter() - t0) * 1000
+    logger.debug(
+        "Successfully fetched %d calendars in %.1f ms",
+        len(results),
+        elapsed,
+    )
 
-        personal_ical = results[0]
-        course_icals = dict(zip(required_courses, results[1:], strict=True))
+    personal_calendar = parse_calendar(
+        f"personal schedule ({source.username})", results[0]
+    )
+    course_calendars = {
+        code: parse_calendar(f"course {code}", ical)
+        for code, ical in zip(required_courses, results[1:], strict=True)
+    }
 
-    return Calendars(personal_ical, course_icals)
+    return Calendars(personal_calendar, course_calendars)

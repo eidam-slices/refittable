@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from datetime import date, time
 from functools import cached_property
 
+from icalendar import Calendar
+
 logger = logging.getLogger(__name__)
 
 
@@ -93,5 +95,5 @@ class Rules:
 
 @dataclass
 class Calendars:
-    personal_ical: str
-    courses_icals: dict[str, str]
+    personal: Calendar
+    courses: dict[str, Calendar]
