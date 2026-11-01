@@ -23,6 +23,7 @@ class FetchError(Exception):
         self.status_code = status_code
         self.label = label
 
+
 # TODO: replace "access_token" parameter with Bearer
 def build_sirius_url(general: General, endpoint: str) -> str:
     return (
@@ -40,7 +41,9 @@ def build_course_calendar_url(general: General, course_code: str) -> str:
     return build_sirius_url(general, f"courses/{course_code}")
 
 
-async def fetch_calendar(client: httpx.AsyncClient, url: str, label: str) -> str:
+async def fetch_calendar(
+    client: httpx.AsyncClient, url: str, label: str
+) -> str:
     try:
         response = await client.get(url)
         response.raise_for_status()
@@ -66,10 +69,14 @@ async def fetch_calendar(client: httpx.AsyncClient, url: str, label: str) -> str
         ) from None
 
 
-async def fetch_all_calendars(rules: Rules, timeout_secs: float = 10) -> Calendars:
+async def fetch_all_calendars(
+    rules: Rules, timeout_secs: float = 10
+) -> Calendars:
     source = rules.general
 
-    required_courses = sorted({rule.take.code for rule in rules.swaps if rule.take is not None})
+    required_courses = sorted(
+        {rule.take.code for rule in rules.swaps if rule.take is not None}
+    )
     logger.debug(
         "Fetching personal schedule for '%s' and %d course(s): %s",
         source.username,
@@ -78,9 +85,14 @@ async def fetch_all_calendars(rules: Rules, timeout_secs: float = 10) -> Calenda
     )
 
     t0 = time.perf_counter()
-    headers = {"User-Agent": "refittable/1.0", "Accept": "text/calendar, text/plain"}
+    headers = {
+        "User-Agent": "refittable/1.0",
+        "Accept": "text/calendar, text/plain",
+    }
 
-    async with httpx.AsyncClient(headers=headers, timeout=timeout_secs) as client:
+    async with httpx.AsyncClient(
+        headers=headers, timeout=timeout_secs
+    ) as client:
         personal_task = fetch_calendar(
             client=client,
             url=build_personal_calendar_url(source),
@@ -99,7 +111,11 @@ async def fetch_all_calendars(rules: Rules, timeout_secs: float = 10) -> Calenda
         results = await asyncio.gather(personal_task, *course_tasks)
 
         elapsed = (time.perf_counter() - t0) * 1000
-        logger.debug("Successfully fetched %d calendars in %.1f ms", len(results), elapsed)
+        logger.debug(
+            "Successfully fetched %d calendars in %.1f ms",
+            len(results),
+            elapsed,
+        )
 
         personal_ical = results[0]
         course_icals = dict(zip(required_courses, results[1:], strict=True))

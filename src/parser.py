@@ -74,13 +74,17 @@ def parse_swap(index: int, item: Any, errors: list[str]) -> SwapRule | None:
             f"Item #{index} in [[{SWAPS_KEY}]]: Missing required subsection [{SWAPS_KEY}.{DROP_KEY}]."
         )
         return None
-    drop_session = parse_session(drop_data, f"{SWAPS_KEY}.{DROP_KEY}", index, errors)
+    drop_session = parse_session(
+        drop_data, f"{SWAPS_KEY}.{DROP_KEY}", index, errors
+    )
     if not drop_session:
         return None
 
     take_data = item.get(TAKE_KEY)
     if take_data:
-        take_session = parse_session(take_data, f"{SWAPS_KEY}.{TAKE_KEY}", index, errors)
+        take_session = parse_session(
+            take_data, f"{SWAPS_KEY}.{TAKE_KEY}", index, errors
+        )
         if not take_session:
             return None
     else:
