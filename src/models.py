@@ -34,6 +34,9 @@ class Session:
     type: str
     number: int | None = None
 
+    def __hash__(self) -> int:
+        return hash((self.code, self.parallel, self.type, self.number))
+
     def __str__(self) -> str:
         number_text = f"{self.number}. " if self.number is not None else ""
         return f"{self.code} {number_text}{self.type} ({self.parallel})"
